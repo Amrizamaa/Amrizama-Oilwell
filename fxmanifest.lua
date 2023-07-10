@@ -1,7 +1,8 @@
 fx_version 'cerulean'
 games { 'gta5' }
 
-author "Swkeep#7049"
+author "Swkeep#7049 & Amrizama"
+version "1.2.0"
 
 shared_script { 'config.lua', 'shared/shared_main.lua' }
 
