@@ -2,18 +2,35 @@
 
 # Preview
 
-- [Youtube video](https://youtu.be/lGgsUonmXmw)
+- Soon Youtube Video
+
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_11-000275.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_18-000276.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_34-000277.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_46-000278.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_50-000279.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_04-000280.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_09-000281.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_11-000282.jpg)
+![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_13-000283.jpg)
 
 # Dependencies
 
-- [qb-target](https://github.com/BerkieBb/qb-target)
+- [ox-target](https://github.com/overextended/ox_target)
 - [qb-menu](https://github.com/qbcore-framework/qb-menu)
+- Temporary : [Okok-Notify](https://okok.tebex.io/package/4724993)
 
 # Key Features
 
 - NoPixel inspired oil company
 - Owning oilwells
-- ...
+- Original script by [Swkeep](https://github.com/swkeep/keep-oilwell)
+
+## Patch 1.2.0 (My Work of Beginner)
+
+- Change all Third target to use Ox-Target Instead of Qb-Target.
+- Added a locales folder and Locale Parameter in config to translate Easily the script (80% ended - Server Sided Notifications not translated)
+- Fix some Bug with Third Target using Qb-Target
 
 ## Patch 1.1.0 (employees)
 
@@ -56,8 +73,8 @@
 
 ## Usage
 
-- add oilwell by "/create oilwell" and then place and asign it to a player. (admins)
-- or use 'oilwell' item to spawn oilwell
+- add oilwell by "/create oilwell" and then place and asign it to a player. (admins) - seems not work
+- or use 'oilwell' item to spawn oilwell (Works perfectly)
 
 ## Installation
 
@@ -206,18 +223,5 @@ else if (itemData.name == "oilbarell") {
 
 # Support
 
-- [Discord](https://discord.gg/ccMArCwrPV)
-
-# Donation
-
-- [Donation](https://swkeep.github.io)
-
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_11-000275.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_18-000276.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_34-000277.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_46-000278.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_00_50-000279.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_04-000280.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_09-000281.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_11-000282.jpg)
-![Keep oilwell](https://raw.githubusercontent.com/swkeep/keep-oilwell/main/.github/images/screenshots/2022-05-17-16_01_13-000283.jpg)
+- Support Discord of [Swkeep](https://discord.gg/ccMArCwrPV)
+- Support Discord of [Amrizama](https://discord.gg/JpYH6yWV8U)
