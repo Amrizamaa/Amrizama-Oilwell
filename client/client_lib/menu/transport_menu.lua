@@ -1,17 +1,20 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 local function show_transport_menu()
-
-     -- header
      local openMenu = {
           {
-               header = 'Transport',
-               txt = "sell your curde oil to make a profit",
+               header = Locales['transport_header'],
+               txt = Locales['transport_description'],
                isMenuHeader = true,
                icon = 'fa-solid fa-ship'
           },
           {
-               header = 'Check Current Price/Stock',
+               header = Locales['check_price_stock'],
                icon = 'fa-solid fa-hand-holding-dollar',
                txt = "",
                params = {
@@ -19,7 +22,7 @@ local function show_transport_menu()
                }
           },
           {
-               header = 'Request Sell Order',
+               header = Locales['request_sell_order'],
                icon = 'fa-solid fa-diagram-successor',
                txt = "",
                params = {
@@ -27,7 +30,7 @@ local function show_transport_menu()
                }
           },
           {
-               header = 'leave',
+               header = Locales['leave'],
                icon = 'fa-solid fa-circle-xmark',
                params = {
                     event = "qb-menu:closeMenu"
@@ -138,14 +141,14 @@ end
 
 AddEventHandler('keep-oilwell:menu:show_transport_menu:ask_to_sell_amount', function()
      local inputData = exports['qb-input']:ShowInput({
-          header = "Enter number of Barrels",
-          submitText = "Sell",
+          header = Locales['sell_amount_header'],
+          submitText = Locales['sell_amount_submit'],
           inputs = {
                {
                     type = 'number',
                     isRequired = true,
                     name = 'amount',
-                    text = "amount"
+                    text = Locales['sell_amount_text']
                },
           }
      })
@@ -156,8 +159,7 @@ AddEventHandler('keep-oilwell:menu:show_transport_menu:ask_to_sell_amount', func
           if type(inputData.amount) == 'string' then
                inputData.amount = math.floor(tonumber(inputData.amount))
           end
-          -- start_barell_animation()
-          QBCore.Functions.Progressbar("keep_oilwell_transport", 'Filling', Oilwell_config.Transport.duration * 1000,
+          QBCore.Functions.Progressbar("keep_oilwell_transport", Locales['filling_progressbar_label'], Oilwell_config.Transport.duration * 1000,
                false, false, {
                     disableMovement = true,
                     disableCarMovement = false,
@@ -165,11 +167,12 @@ AddEventHandler('keep-oilwell:menu:show_transport_menu:ask_to_sell_amount', func
                     disableCombat = true
                }, {}, {}, {}, function()
                QBCore.Functions.TriggerCallback('keep-oilrig:server:oil_transport:fillTransportWell', function(res)
-                    -- end_barell_animaiton()
+                    -- Actions à effectuer après la fin du remplissage du transporteur
                end, inputData.amount)
           end)
      end
 end)
+
 
 local inventory_max_size = Oilwell_config.inventory_max_size
 

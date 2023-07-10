@@ -1,4 +1,9 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 local function showStorage(storage_data)
      local header = storage_data.name
@@ -9,7 +14,7 @@ local function showStorage(storage_data)
                isMenuHeader = true,
                icon = 'fa-solid fa-warehouse'
           }, {
-               header = 'Crude oil',
+               header = Locales['crude_oil'],
                icon = 'fa-solid fa-oil-can',
                txt = "" .. storage_data.metadata.crudeOil .. " /gal",
                params = {
@@ -21,9 +26,9 @@ local function showStorage(storage_data)
                }
           },
           {
-               header = 'Gasoline',
+               header = Locales['gasoline'],
                icon = 'fa-solid fa-oil-can',
-               txt = "" .. storage_data.metadata.gasoline .. " /gal | Octane: " .. storage_data.metadata.avg_gas_octane,
+               txt = "" .. storage_data.metadata.gasoline .. " /gal | " .. Locales['octane'] .. ": " .. storage_data.metadata.avg_gas_octane,
                params = {
                     event = 'keep-oilrig:storage_menu:StorageActions',
                     args = {
@@ -37,7 +42,7 @@ local function showStorage(storage_data)
 
      if storage_data.metadata.fuel_oil then
           openMenu[#openMenu + 1] = {
-               header = 'Fuel Oil',
+               header = Locales['fuel_oil'],
                icon = 'fa-solid fa-oil-can',
                txt = "" .. storage_data.metadata.fuel_oil .. " /gal",
                params = {
@@ -52,7 +57,7 @@ local function showStorage(storage_data)
 
 
      openMenu[#openMenu + 1] = {
-          header = 'leave',
+          header = Locales['leave'],
           icon = 'fa-solid fa-circle-xmark',
           params = {
                event = "qb-menu:closeMenu"
@@ -63,7 +68,7 @@ local function showStorage(storage_data)
 end
 
 local function showStorageActions(data)
-     local header = "Actions " .. data.type
+     local header = Locales['actions'] .. " " .. data.type
      local storage_data = data.storage_data
      -- header
      local openMenu = {
@@ -72,7 +77,7 @@ local function showStorageActions(data)
                isMenuHeader = true,
                icon = 'fa-solid fa-pump'
           }, {
-               header = 'Withraw from storage',
+               header = Locales['withdraw'],
                icon = 'fa-solid fa-truck-ramp-box',
                txt = "",
                params = {
@@ -81,14 +86,14 @@ local function showStorageActions(data)
                }
           },
           {
-               header = 'Storage action',
+               header = Locales['storage_action'],
                icon = 'fa-solid fa-arrow-right-arrow-left',
                params = {
                     event = '',
                }
           },
           {
-               header = 'Back',
+               header = Locales['back'],
                icon = 'fa-solid fa-angle-left',
                params = {
                     event = "keep-oilrig:storage_menu:ShowStorage"
@@ -99,8 +104,9 @@ local function showStorageActions(data)
      exports['qb-menu']:openMenu(openMenu)
 end
 
+
 local function showStorageWithdraw(data)
-     local header = "Storage withdraw (" .. data.type .. ")"
+     local header = Locales['storage_withdraw'] .. " (" .. data.type .. ")"
      local currentWithdrawTarget = data.storage_data.metadata[data.type] -- oil or gas
      -- header
      local openMenu = {
@@ -110,13 +116,13 @@ local function showStorageWithdraw(data)
                icon = 'fa-solid fa-boxes-packing'
           },
           {
-               header = 'you have ' .. currentWithdrawTarget .. ' gal of ' .. data.type,
+               header = Locales['current_withdraw'] .. currentWithdrawTarget .. ' ' .. Locales['gal_of'] .. ' ' .. data.type,
                isMenuHeader = true,
                icon = 'fa-solid fa-boxes-packing'
           }, {
-               header = 'Store in Barrel',
+               header = Locales['store_in_barrel'],
                icon = 'fa-solid fa-bottle-droplet',
-               txt = "deposit: $500   Capacity: 5000 /gal",
+               txt = Locales['deposit'] .. "$500   " .. Locales['capacity'] .. " 5000 " .. Locales['gal'],
                params = {
                     event = 'keep-oilrig:storage_menu:Callback',
                     args = {
@@ -128,9 +134,9 @@ local function showStorageWithdraw(data)
                }
           },
           {
-               header = 'Load in Truck',
+               header = Locales['load_in_truck'],
                icon = 'fa-solid fa-truck-droplet',
-               txt = "deposit: $25,000k   Capacity: 100,000 /gal",
+               txt = Locales['deposit'] .. "$25,000k   " .. Locales['capacity'] .. " 100,000 " .. Locales['gal'],
                params = {
                     event = 'keep-oilrig:storage_menu:Callback',
                     args = {
@@ -142,7 +148,7 @@ local function showStorageWithdraw(data)
                }
           },
           {
-               header = 'Back',
+               header = Locales['back'],
                icon = 'fa-solid fa-angle-left',
                params = {
                     event = "keep-oilrig:storage_menu:StorageActions",
@@ -152,6 +158,7 @@ local function showStorageWithdraw(data)
      }
      exports['qb-menu']:openMenu(openMenu)
 end
+
 
 MakeVehicle = function(model, Coord, TriggerLocation, DinstanceToTrigger, items)
      local plyped = PlayerPedId()
@@ -177,7 +184,7 @@ MakeVehicle = function(model, Coord, TriggerLocation, DinstanceToTrigger, items)
           Wait(0)
      end
 
-     local vehiclePlate = "SWK" .. math.random(1, 9) .. math.random(1, 9) .. math.random(1, 9)
+     local vehiclePlate = "VSP" .. math.random(1, 9) .. math.random(1, 9) .. math.random(1, 9)
      model = GetHashKey(model)
      RequestModel(model)
      while not HasModelLoaded(model) do
@@ -243,14 +250,14 @@ end)
 
 AddEventHandler('keep-oilrig:storage_menu:Callback', function(data)
      local inputData = exports['qb-input']:ShowInput({
-          header = "Enter withdraw value",
-          submitText = "Confirm",
+          header = Locales['enter_withdraw_value'],
+          submitText = Locales['confirm'],
           inputs = {
                {
                     type = 'number',
                     isRequired = true,
                     name = 'amount',
-                    text = "amount"
+                    text = Locales['amount']
                },
           }
      })
@@ -266,7 +273,6 @@ AddEventHandler('keep-oilrig:storage_menu:Callback', function(data)
 end)
 
 
--- withdraw spot
 AddEventHandler("keep-oilwell:client:openWithdrawStash", function(data)
      local player = QBCore.Functions.GetPlayerData()
      if not data then return end
@@ -275,24 +281,23 @@ AddEventHandler("keep-oilwell:client:openWithdrawStash", function(data)
      TriggerEvent("inventory:client:SetCurrentStash", "Withdraw_" .. player.citizenid)
 end)
 
--- purge menu
 local function purge_menu()
      local openMenu = {
           {
-               header = 'PURGE',
-               txt = 'do you want to purge withdraw stash?',
+               header = Locales['purge'],
+               txt = Locales['confirm_purge'],
                icon = 'fa-solid fa-trash-can',
                isMenuHeader = true,
           },
           {
-               header = 'Confirm Purge!',
+               header = Locales['confirm_purge'],
                icon = 'fa-solid fa-square-check',
                params = {
                     event = 'keep-oilwell:client:purgeWithdrawStash',
                }
           },
           {
-               header = 'Cancel',
+               header = Locales['cancel'],
                icon = 'fa-solid fa-circle-xmark',
                params = {
                     event = "qb-menu:closeMenu"
@@ -309,7 +314,7 @@ end)
 local purge_conf = 0
 AddEventHandler('keep-oilwell:client:purgeWithdrawStash', function()
      if purge_conf == 0 then
-          QBCore.Functions.Notify('Try again to confirm Purge! (confirmation will reset in 5sec)', "primary")
+          QBCore.Functions.Notify(Locales['confirm_purge_retry'], "primary")
           purge_conf = purge_conf + 1
           SetTimeout(5000, function()
                purge_conf = 0

@@ -6,6 +6,7 @@ author "Swkeep#7049"
 shared_script { 'config.lua', 'shared/shared_main.lua' }
 
 client_scripts {
+     'locales/fr.lua',
      '@menuv/menuv.lua',
      'client/client.lua',
      'client/client_lib/client_lib_entry.lua',

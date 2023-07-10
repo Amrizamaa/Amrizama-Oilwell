@@ -4,6 +4,11 @@ PlayerJob = {}
 OnDuty = nil
 OBJECT = nil
 local rigmodel = GetHashKey('p_oil_pjack_03_s')
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 function CheckJob()
      return (PlayerJob.name == 'oilwell')
@@ -162,29 +167,29 @@ end
 --
 RegisterNetEvent('keep-oilrig:client:changeRigSpeed', function(qbtarget)
      if not CheckJob() then
-          QBCore.Functions.Notify('You not a hired by oil company', "error")
+          QBCore.Functions.Notify(Locales['not_hired'], "error")
           return false
      end
      if not CheckOnduty() then
-          QBCore.Functions.Notify('You must be on duty!', "error")
+          QBCore.Functions.Notify(Locales['must_be_on_duty'], "error")
           return false
      end
      local rig = OilRigs:getByEntityHandle(qbtarget.entity)
      if not rig then
-          return print('oilwell not found')
+          return print(Locales['oilwell_not_found'])
      end
      QBCore.Functions.TriggerCallback('keep-oilwell:server:oilwell_metadata', function(metadata)
           OilRigs:startUpdate(function()
 
                local inputData = exports['qb-input']:ShowInput({
-                    header = "Change oil rig speed",
-                    submitText = "change",
+                    header = Locales['change_speed_header'],
+                    submitText = Locales['change_speed_submit'],
                     inputs = {
                          {
                               type = 'text',
                               isRequired = true,
                               name = 'speed',
-                              text = 'current speed ' .. metadata.speed
+                              text = string.format(Locales['current_speed_text'], metadata.speed)
                          },
                     }
                })
@@ -194,10 +199,11 @@ RegisterNetEvent('keep-oilrig:client:changeRigSpeed', function(qbtarget)
                          return
                     end
                     if not (0 <= speed and speed <= 100) then
-                         QBCore.Functions.Notify('speed must be between 0 to 100', "error")
+                         QBCore.Functions.Notify(Locales['speed_range_error'], "error")
                          return
                     end
-                    QBCore.Functions.Notify('oilwell speed changed to ' .. speed, "success")
+--                    QBCore.Functions.Notify(Locales['speed_changed_success'], speed, "success", 2)
+                    exports['okokNotify']:Alert(Locales['society_name'], Locales['speed_changed_success'].. speed .. ' %', 5000, 'success', playSound)
                     TriggerServerEvent('keep-oilrig:server:updateSpeed', inputData, rig.id)
                end
           end)
@@ -246,99 +252,114 @@ AddEventHandler('keep-oilrig:client:spawn', function()
           if NetId ~= nil then
                local entity = NetworkGetEntityFromNetworkId(NetId)
                OBJECT = entity
-               exports['qb-target']:AddEntityZone("oil-rig-" .. entity, entity, {
-                    name = "oil-rig-" .. entity,
-                    heading = GetEntityHeading(entity),
-                    debugPoly = false,
-               }, {
-                    options = {
-                         {
-                              type = "client",
-                              event = "keep-oilrig:client:enterInformation",
-                              icon = "fa-regular fa-file-lines",
-                              label = "Assign to player",
-                              canInteract = function(entity)
-                                   if not CheckJob() then return false end
-                                   if not (PlayerJob.grade.level == 4) then
-                                        TriggerEvent('QBCore:Notify', 'You must be on duty!', "error")
-                                        Wait(2000)
-                                        return false
-                                   end
-                                   if not CheckOnduty() then
-                                        TriggerEvent('QBCore:Notify', 'You must be on duty!', "error")
-                                        Wait(2000)
-                                        return false
-                                   end
-                                   return true
-                              end,
-                         },
-                         {
-                              type = "client",
-                              event = "keep-oilwell:menu:OPENMENU",
-                              icon = "fa-regular fa-file-lines",
-                              label = "Adjust position",
-                              canInteract = function(entity)
-                                   if not CheckJob() then
-                                        TriggerEvent('QBCore:Notify', 'Only CEO have access to this', "error")
-                                        Wait(2000)
-                                        return false
-                                   end
-                                   if not (PlayerJob.grade.level == 4) then
-                                        TriggerEvent('QBCore:Notify', 'Only CEO have access to this', "error")
-                                        Wait(2000)
-                                        return false
-                                   end
-                                   if not CheckOnduty() then
-                                        TriggerEvent('QBCore:Notify', 'You must be on duty!', "error")
-                                        Wait(2000)
-                                        return false
-                                   end
-                                   return true
-                              end,
-                         },
-                    },
-                    distance = 2.5
+           
+               local entityCoords = GetEntityCoords(entity)
+               local entitySize = vector3(4, 4, 6)
+               local entityRotation = GetEntityHeading(entity)
+           
+               exports.ox_target:addBoxZone({
+                   coords = entityCoords,
+                   size = entitySize,
+                   rotation = entityRotation,
+                   debug = false,
+                   options = {
+                       {
+                           icon = "fa-regular fa-file-lines",
+                           label = Locales['assign_to_player'],
+                           canInteract = function()
+                               if not CheckJob() then
+                                   return false
+                               end
+                               if not (PlayerJob.grade.level == 4) then
+                                   TriggerEvent('QBCore:Notify', Locales['must_be_on_duty'], "error")
+                                   Wait(2000)
+                                   return false
+                               end
+                               if not CheckOnduty() then
+                                   TriggerEvent('QBCore:Notify', Locales['must_be_on_duty'], "error")
+                                   Wait(2000)
+                                   return false
+                               end
+                               return true
+                           end,
+                           onSelect = function()
+                               -- Code à exécuter lors de la sélection de l'option
+                               TriggerEvent('keep-oilrig:client:enterInformation')
+                           end,
+                       },
+                       {
+                           icon = "fa-regular fa-file-lines",
+                           label = "Adjust position",
+                           canInteract = function()
+                               if not CheckJob() then
+                                   TriggerEvent('QBCore:Notify', Locales['only_ceo'], "error")
+                                   Wait(2000)
+                                   return false
+                               end
+                               if not (PlayerJob.grade.level == 4) then
+                                   TriggerEvent('QBCore:Notify', Locales['only_ceo'], "error")
+                                   Wait(2000)
+                                   return false
+                               end
+                               if not CheckOnduty() then
+                                   TriggerEvent('QBCore:Notify', Locales['must_be_on_duty'], "error")
+                                   Wait(2000)
+                                   return false
+                               end
+                               return true
+                           end,
+                           onSelect = function()
+                               -- Code à exécuter lors de la sélection de l'option
+                               TriggerEvent('keep-oilwell:menu:OPENMENU')
+                           end,
+                       },
+                   },
                })
-          end
+           end
      end, coords)
 end)
 
 
-RegisterNetEvent('keep-oilrig:client:enterInformation', function(qbtarget)
+RegisterNetEvent('keep-oilrig:client:enterInformation', function()
      local inputData = exports['qb-input']:ShowInput({
-          header = "Assign oil rig: ",
-          submitText = "Assign",
-          inputs = { {
-               type = 'text',
-               isRequired = true,
-               name = 'name',
-               text = "enter rig name"
-          },
-               {
-                    type = 'number',
-                    isRequired = true,
-                    name = 'cid',
-                    text = "current player cid"
-               },
-          }
+         header = Locales['assign_pump'],
+         submitText = Locales['register_pump'],
+         inputs = {
+             {
+                 type = 'text',
+                 isRequired = true,
+                 name = 'name',
+                 text = Locales['name_pump']
+             },
+             {
+                 type = 'number',
+                 isRequired = true,
+                 name = 'cid',
+                 text = Locales['id_player_name']
+             },
+         }
      })
      if inputData then
-          if not inputData.name and not inputData.cid then
-               return
-          end
-          local netId = NetworkGetNetworkIdFromEntity(qbtarget.entity)
-
-          inputData.netId = netId
-          QBCore.Functions.TriggerCallback('keep-oilrig:server:regiserOilrig', function(result)
-               DeleteEntity(qbtarget.entity)
-               if result == true then
-                    Wait(1500)
-                    QBCore.Functions.Notify('Registering oilwell to: ' .. inputData.cid, "success")
-                    loadData()
-               end
-          end, inputData)
+         if not inputData.name or not inputData.cid then
+             return
+         end
+ 
+         local coords = GetEntityCoords(OBJECT)
+         local netId = NetworkGetNetworkIdFromEntity(OBJECT)
+ 
+         inputData.netId = netId
+ 
+         QBCore.Functions.TriggerCallback('keep-oilrig:server:registerOilrig', function(result)
+             if result == true then
+                 DeleteEntity(OBJECT)
+                 Wait(1500)
+                 QBCore.Functions.Notify(string.format(Locales['registering_oil_rig_to'], inputData.cid), "success")
+                 loadData()
+             end
+         end, inputData)
      end
-end)
+ end)
+ 
 
 RegisterNetEvent('keep-oilwell:client:force_reload', function()
      Wait(25)
@@ -385,9 +406,10 @@ RegisterNetEvent('QBCore:Client:SetDuty', function(duty)
 end)
 
 RegisterNetEvent('keep-oilrig:client:local_mail_sender', function(data)
-     local Lang = Oilwell_config.Locale
-     Lang.mail.message = string.format(Lang.mail.message, data.gender, data.charinfo.lastname, data.money, data.amount,
-          data.refund)
+     local Lang = Oilwell_config.translations[Oilwell_config.locales] -- Chargement des traductions correspondantes
+     
+     Lang.mail.message = string.format(Lang.mail.message, data.gender, data.charinfo.lastname, data.money, data.amount, data.refund)
+     
      TriggerServerEvent('qb-phone:server:sendNewMail', {
           sender = Lang.mail.sender,
           subject = Lang.mail.subject,
@@ -395,6 +417,7 @@ RegisterNetEvent('keep-oilrig:client:local_mail_sender', function(data)
           button = {}
      })
 end)
+
 
 RegisterNetEvent('keep-oilwell:server_lib:AddExplosion', function(bullding_type)
      local c = Oilwell_config.locations[bullding_type].position

@@ -1,14 +1,19 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 local function showCDU(data)
      if not data then return end
      local state = ''
      if data.metadata.state == true then
-          state = 'Active'
+          state = Locales['active']
      else
-          state = 'inactive'
+          state = Locales['inactive']
      end
-     local header = "Crude oil distillation unit (" .. state .. ')'
+     local header = Locales['crude_oil_distillation_unit'] .. " (" .. state .. ')'
      -- header
      local CDU_Temperature = data.metadata.temp
      local CDU_Gal = data.metadata.oil_storage
@@ -17,39 +22,40 @@ local function showCDU(data)
                header = header,
                isMenuHeader = true,
                icon = 'fa-solid fa-gear'
-          }, {
-               header = 'Temperature',
+          },
+          {
+               header = Locales['temperature'],
                icon = 'fa-solid fa-temperature-high',
                txt = "" .. CDU_Temperature .. " °C",
           },
           {
-               header = 'Curde Oil inside CDU',
+               header = Locales['crude_oil_inside_CDU'],
                icon = 'fa-solid fa-oil-can',
-               txt = CDU_Gal .. " Gallons",
+               txt = CDU_Gal .. " " .. Locales['gallons'],
           },
           {
-               header = 'Pump Curde Oil to CDU',
+               header = Locales['pump_crude_oil_to_CDU'],
                icon = 'fa-solid fa-arrows-spin',
                params = {
                     event = "keep-oilrig:CDU_menu:pumpCrudeOil_to_CDU"
                }
           },
           {
-               header = 'Change Temperature',
+               header = Locales['change_temperature'],
                icon = 'fa-solid fa-temperature-arrow-up',
                params = {
                     event = "keep-oilrig:CDU_menu:set_CDU_temp"
                }
           },
           {
-               header = 'Toggle CDU',
+               header = Locales['toggle_CDU'],
                icon = 'fa-solid fa-sliders',
                params = {
                     event = "keep-oilrig:CDU_menu:switchPower_of_CDU"
                }
           },
           {
-               header = 'leave',
+               header = Locales['leave'],
                icon = 'fa-solid fa-circle-xmark',
                params = {
                     event = "qb-menu:closeMenu"
@@ -58,6 +64,7 @@ local function showCDU(data)
      }
      exports['qb-menu']:openMenu(openMenu)
 end
+
 
 AddEventHandler('keep-oilrig:CDU_menu:ShowCDU', function()
      QBCore.Functions.TriggerCallback('keep-oilrig:server:get_CDU_Data', function(result)
@@ -73,14 +80,15 @@ end)
 
 AddEventHandler('keep-oilrig:CDU_menu:set_CDU_temp', function()
      local inputData = exports['qb-input']:ShowInput({
-          header = "CDU Temperature",
-          submitText = "Assign new temperature",
-          inputs = { {
-               type = 'number',
-               isRequired = true,
-               name = 'temp',
-               text = "Enter new temperature"
-          },
+          header = Locales['CDU_temperature'],
+          submitText = Locales['assign_new_temperature'],
+          inputs = {
+               {
+                    type = 'number',
+                    isRequired = true,
+                    name = 'temp',
+                    text = Locales['enter_new_temperature']
+               },
           }
      })
      if inputData then
@@ -95,14 +103,15 @@ end)
 
 AddEventHandler('keep-oilrig:CDU_menu:pumpCrudeOil_to_CDU', function()
      local inputData = exports['qb-input']:ShowInput({
-          header = "Pump crude oil to CDU",
-          submitText = "Enter",
-          inputs = { {
-               type = 'number',
-               isRequired = true,
-               name = 'amount',
-               text = "Enter Value"
-          },
+          header = Locales['pump_crude_oil_to_CDU'],
+          submitText = Locales['enter'],
+          inputs = {
+               {
+                    type = 'number',
+                    isRequired = true,
+                    name = 'amount',
+                    text = Locales['enter_value']
+               },
           }
      })
      if inputData then
@@ -112,7 +121,7 @@ AddEventHandler('keep-oilrig:CDU_menu:pumpCrudeOil_to_CDU', function()
           end
 
           if inputData.amount <= 0 then
-               QBCore.Functions.Notify('Amount must be more than 0', "error")
+               QBCore.Functions.Notify(Locales['amount_more_than_zero'], "error")
                return
           end
           QBCore.Functions.TriggerCallback('keep-oilrig:server:pumpCrudeOil_to_CDU', function(result)

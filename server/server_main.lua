@@ -1,4 +1,9 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+local notiftime = 5000
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 --devices
 -- ===========================================
@@ -18,7 +23,8 @@ end)
 QBCore.Functions.CreateCallback('keep-oilrig:server:pump_fueloil', function(source, cb, data)
      local player = QBCore.Functions.GetPlayer(source)
      if player == nil then
-          TriggerClientEvent('QBCore:Notify', source, "failed to find player!")
+     --     TriggerClientEvent('QBCore:Notify', source, Locales['failed_to_find_player'])
+          TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Impossible de trouver le joueur !', notiftime, 'error', playSound)
           cb(false)
           return
      end
@@ -28,7 +34,8 @@ end)
 QBCore.Functions.CreateCallback('keep-oilrig:server:PumpOilToStorageCallback', function(source, cb, data)
      local player = QBCore.Functions.GetPlayer(source)
      if player == nil then
-          TriggerClientEvent('QBCore:Notify', source, "failed to find player!")
+      --    TriggerClientEvent('QBCore:Notify', source, Locales['failed_to_find_player'])
+     TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Impossible de trouver le joueur !', notiftime, 'error', playSound)
           cb(false)
           return
      end
@@ -39,12 +46,14 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:PumpOilToStorageCallback', f
      end
      local is_employee, is_owner = oilrig.is_employee(player.PlayerData.citizenid)
      if not is_employee and not is_owner then
-          TriggerClientEvent('QBCore:Notify', source, "You do no have access to this part!")
+--TriggerClientEvent('QBCore:Notify', source, Locales['no_access_to_part'])
+     TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Vous n\'avez pas accès à cette partie !', notiftime, 'error', playSound)
           cb(false)
           return
      end
      if oilrig.metadata.oil_storage <= 0 then
-          TriggerClientEvent('QBCore:Notify', source, "Oil storage is empty!")
+     --     TriggerClientEvent('QBCore:Notify', source, Locales['oil_storage_empty'])
+     TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Le réservoir de pétrole est vide !', notiftime, 'error', playSound)
           cb(false)
           return
      end
@@ -71,7 +80,8 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:Withdraw', function(source, 
      if not data.type then cb(false) return end
      if type(data.amount) == "string" then data.amount = tonumber(data.amount) end
      if data.amount <= 0 then
-          TriggerClientEvent('QBCore:Notify', source, "Withdraw must be more than 0!", 'error')
+          TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Le montant du retrait doit être supérieur à 0 !', notiftime, 'error', playSound)
+ --         TriggerClientEvent('QBCore:Notify', source, Locales['withdraw_amount_error'], 'error')
           return
      end
 
@@ -80,15 +90,13 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:Withdraw', function(source, 
           local stash_size = 5
 
           if data.amount > (barrel_max_size * stash_size) then
-               TriggerClientEvent('QBCore:Notify', source, "Withdraw stash dont have enough space!", 'error')
-               TriggerClientEvent('QBCore:Notify', source, "Maximum: " .. (barrel_max_size * stash_size) .. "/Gal",
-                    'error')
+               TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Le stockage de retrait n\'a pas suffisamment d\'espace !', notiftime, 'error', playSound)
+               TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', "Maximum: " .. (barrel_max_size * stash_size) .. "/Gal", notiftime, 'error', playSound)
                return
           end
      else
           if data.amount > 100000 then
-               TriggerClientEvent('QBCore:Notify', source, "Maximum: 100,000/Gal",
-                    'error')
+               TriggerClientEvent('QBCore:Notify', source, 'Maximum : 100,000/Gal', 'error')
                return
           end
      end
@@ -102,15 +110,15 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:Withdraw', function(source, 
                citizenid = citizenid,
                name = player.PlayerData.name .. "'s storage",
           })
-          TriggerClientEvent('QBCore:Notify', source, "Could not find connect to your stroage try again!", 'error')
+          TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Impossible de se connecter à votre stockage, veuillez réessayer !', notiftime, 'error', playSound)
           cb(false)
           return
      end
 
      local value = storage.metadata[data.type]
      if value < data.amount then
-          TriggerClientEvent('QBCore:Notify', source, "You can not withdraw this much!", 'error')
-          TriggerClientEvent('QBCore:Notify', source, "Requested: " .. data.amount .. " Current: " .. value, 'error')
+          TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Vous ne pouvez pas retirer autant !', notiftime, 'error', playSound)
+          TriggerClientEvent('QBCore:Notify', source, "Demandé: " .. data.amount .. " Actuel : " .. value, 'error')
           cb(false)
           return
      end
@@ -128,9 +136,10 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:Withdraw', function(source, 
           storage.metadata.avg_gas_octane = 87
           storage.metadata[data.type] = 0
      end
-     TriggerClientEvent('QBCore:Notify', source, "We compeleted your withdraw request.", 'success')
+     TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Votre demande de retrait a été effectuée avec succès.', notiftime, 'success', playSound)
      cb(true)
 end)
+
 
 local function isWithdrawStashEmpty(Player)
      local stash = 'Withdraw_' .. Player.PlayerData.citizenid
@@ -248,7 +257,7 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:withdraw_from_queue', functi
                citizenid = citizenid,
                name = player.PlayerData.name .. "'s storage",
           })
-          TriggerClientEvent('QBCore:Notify', source, "Could not find connect to your stroage try again!", 'error')
+          TriggerClientEvent('QBCore:Notify', source, 'Impossible de se connecter à votre stockage, veuillez réessayer !', 'error')
           cb(false)
           return
      end
@@ -259,7 +268,7 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:withdraw_from_queue', functi
           return
      end
      if type(storage.metadata.queue) == "table" and next(storage.metadata.queue) == nil then
-          TriggerClientEvent('QBCore:Notify', source, "You don't have anything in queue!", 'error')
+          TriggerClientEvent('QBCore:Notify', source, 'Vous n\'avez rien dans cette file d\'attente !', 'error')
           cb(false)
           return
      end
@@ -275,12 +284,11 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:withdraw_from_queue', functi
           if not barrel.truck then
                local stashEmpty, size = isWithdrawStashEmpty(player)
                if not stashEmpty and not (size == -1) then
-                    TriggerClientEvent('QBCore:Notify', source, "withdraw stash is not empty!", 'error')
+                    TriggerClientEvent('QBCore:Notify', source, 'Le stockage de retrait n\'est pas vide !', 'error')
                     cb(false)
                     return
                elseif not stashEmpty and size == -1 then
-                    TriggerClientEvent('QBCore:Notify', source, "pls, open your withdraw stash for first time!",
-                         'error')
+                    TriggerClientEvent('QBCore:Notify', source, 'Veuillez ouvrir votre stockage de retrait pour la première fois !', 'error')
                     cb(false)
                     return
                end
@@ -293,12 +301,12 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:withdraw_from_queue', functi
                local removemoeny = player.Functions.RemoveMoney('bank', total_cost, 'oil_barells')
                if removemoeny then
                     add_oilbarell_2(player, divide_res, barrel.type, barrel.avg_gas_octane)
-                    TriggerClientEvent('QBCore:Notify', source, "Request compeleted!", 'success')
+                    TriggerClientEvent('QBCore:Notify', source, 'Votre demande de retrait a été effectuée avec succès.', 'success')
                     cb({ truck = false })
                     storage.metadata.queue[key] = nil
                     return
                else
-                    TriggerClientEvent('QBCore:Notify', source, "No money!", 'error')
+                    TriggerClientEvent('QBCore:Notify', source, 'Pas assez d\'argent !', 'error')
                end
                cb(storage)
                return
@@ -310,21 +318,23 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:withdraw_from_queue', functi
                if removemoeny then
                     local items = Split_oilbarrel_size(divide_res, barrel.type, barrel.avg_gas_octane)
                     items.truck = true
-                    TriggerClientEvent('QBCore:Notify', source, "Request compeleted!", 'success')
+             --       TriggerClientEvent('QBCore:Notify', source, Locales['withdraw_completed'], 'success')
+                    TriggerClientEvent('okokNotify:Alert', source, 'Compagnie Pétrolière', 'Votre demande de retrait a été effectuée avec succès.', notiftime, 'success')
                     cb(items)
                     storage.metadata.queue[key] = nil
                     return
                else
-                    TriggerClientEvent('QBCore:Notify', source, "No money!", 'error')
+                    TriggerClientEvent('QBCore:Notify', source, 'Pas assez d\'argent !', 'error')
                end
                cb(storage)
                return
           end
           ::here::
      end
-     TriggerClientEvent('QBCore:Notify', source, "You don't have anything in this queue!", 'error')
+     TriggerClientEvent('QBCore:Notify', source, 'Vous n\'avez rien dans cette file d\'attente !', 'error')
      cb(false)
 end)
+
 
 QBCore.Functions.CreateUseableItem('oilbarell', function(source, item)
      local Player = QBCore.Functions.GetPlayer(source)
@@ -395,13 +405,13 @@ RegisterNetEvent('keep-oilrig:server:updateSpeed', function(inputData, id)
      local oilrig = GlobalScirptData:read(id)
      local is_employee, is_owner = oilrig.is_employee(player.PlayerData.citizenid)
      if not is_employee and not is_owner then
-          TriggerClientEvent('QBCore:Notify', source, "You do not have access to this oilwell!", 'error')
+          TriggerClientEvent('QBCore:Notify', source, 'Vous n\'avez pas accès à cette plateforme pétrolière !', 'error')
           return
      end
 
      local speed = tonumber(inputData.speed)
      if not (0 <= speed and speed <= 100) then
-          TriggerClientEvent('QBCore:Notify', source, 'speed must be between 0 to 100', "error")
+          TriggerClientEvent('QBCore:Notify', source, 'La vitesse doit être comprise entre 0 et 100', 'error')
           return
      end
 
@@ -409,6 +419,7 @@ RegisterNetEvent('keep-oilrig:server:updateSpeed', function(inputData, id)
      -- sync speed on other clients
      TriggerClientEvent('keep-oilrig:client:syncSpeed', -1, id, speed)
 end)
+
 
 QBCore.Functions.CreateCallback('keep-oilrig:server:get_CDU_Data', function(source, cb)
      local player = QBCore.Functions.GetPlayer(source)
@@ -464,19 +475,19 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:pumpCrudeOil_to_CDU', functi
                citizenid = citizenid,
                name = player.PlayerData.name .. "'s storage",
           })
-          TriggerClientEvent('QBCore:Notify', source, "Could not find connect to your stroage try again!", 'error')
+          TriggerClientEvent('QBCore:Notify', source, 'Impossible de trouver votre stockage, réessayez !', 'error')
           cb(false)
           return
      end
 
      if inputData.amount <= 0 then
-          TriggerClientEvent('QBCore:Notify', source, "Must be more than 0", 'error')
+          TriggerClientEvent('QBCore:Notify', source, 'La quantité doit être supérieure à 0', 'error')
           cb(CDU)
           return
      end
 
      if storage.metadata.crudeOil == 0.0 then
-          TriggerClientEvent('QBCore:Notify', source, "Your storage is empty", 'error')
+          TriggerClientEvent('QBCore:Notify', source, 'Votre stockage est vide', 'error')
           cb(CDU)
           return
      end
@@ -525,7 +536,7 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:recipe_blender', function(so
      for _, value in pairs(inputData) do
           local current_num = tonumber(value)
           if not inRange(current_num, 0, 100) then
-               TriggerClientEvent('QBCore:Notify', source, "numbers must be between 0-100", 'error')
+               TriggerClientEvent('QBCore:Notify', source, 'Les chiffres doivent être compris entre 0 et 100', 'error')
                return
           end
           inputData[_] = current_num
@@ -541,6 +552,7 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:recipe_blender', function(so
 
      cb(blender)
 end)
+
 
 local current_transport_stock = {
      crudeOil = 0,
@@ -578,62 +590,56 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:oil_transport:fillTransportW
      local msg_string = ""
 
      if not oil_barrel then
-          TriggerClientEvent('QBCore:Notify', source, 'You do not have a oil barrel!', 'error')
+          TriggerClientEvent('QBCore:Notify', source, "Vous n'avez pas de baril de pétrole !", 'error')
           return
      end
      local current_info = oil_barrel.info
 
      if not current_info.type then
-          TriggerClientEvent('QBCore:Notify', source, 'Failed to get oil type', 'error')
+          TriggerClientEvent('QBCore:Notify', source, "Échec lors de la récupération du type de pétrole", 'error')
           return
      end
 
      if not (current_info.type == 'crudeOil' or current_info.type == 'fuel_oil' or current_info.type == 'gasoline') then
-          TriggerClientEvent('QBCore:Notify', source, 'We dont export this type of oil!', 'error')
+          TriggerClientEvent('QBCore:Notify', source, "Nous n'exportons pas ce type de pétrole !", 'error')
           return
      end
 
      if reachedMaxStock(current_info.type) then
-          -- when we reached max stock
-          TriggerClientEvent('QBCore:Notify', source, 'Currently we can not accept more offers pls come back later!',
-               'primary')
+          TriggerClientEvent('QBCore:Notify', source, "Nous ne pouvons pas accepter plus d'offres pour le moment, veuillez revenir plus tard !", 'primary')
           return
      end
 
      if not canWeAcceptMoreStock(current_info.type, amount) then
-          -- when buying results in more oil than what we need
           local max_amount = math.floor(TRANSPORT.max_stock - current_transport_stock)
-          msg_string = "We can only accept maximum amount of %d gallons"
+          msg_string = "Nous ne pouvons accepter qu'un maximum de %d gallons"
           msg_string = string.format(msg_string, max_amount)
-          TriggerClientEvent('QBCore:Notify', source, '', 'error')
+          TriggerClientEvent('QBCore:Notify', source, msg_string, 'error')
           return
      end
 
      if current_info.gal < amount then
-          -- when they don't have what they want to sell
-          msg_string = 'You asked to sell:  %d but only have: %d'
+          msg_string = "Vous avez demandé de vendre : %d gallons, mais vous n'en avez que : %d"
           msg_string = string.format(msg_string, amount, current_info.gal)
           TriggerClientEvent('QBCore:Notify', source, msg_string, 'error')
           cb(false)
           return
      end
 
-     local gender = Oilwell_config.Locale.info.mr
+     local gender = Locales['info_mr']
      if player.PlayerData.charinfo.gender == 1 then
-          gender = Oilwell_config.Locale.info.mrs
+          gender = Locales['info_mrs']
      end
      local charinfo = player.PlayerData.charinfo
 
      local cost = TRANSPORT.prices[current_info.type] * amount
      if current_info.gal > amount then
-          -- asking less than what they have
           current_info.gal = math.floor(current_info.gal - amount)
-          -- this function can be called just once after conditions but this should prevent switching slots
           change_item_info(player, oil_barrel.slot, oil_barrel.info)
 
           player.Functions.AddMoney("bank", cost, 'crude_oil_transport')
 
-          msg_string = 'You sold: %d gal for: %.2f$'
+          msg_string = "Vous avez vendu : %d gallons pour : %.2f$"
           msg_string = string.format(msg_string, amount, cost)
           TriggerClientEvent('QBCore:Notify', source, msg_string, 'success')
 
@@ -645,16 +651,14 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:oil_transport:fillTransportW
                amount = amount
           })
      elseif current_info.gal == amount and amount ~= 0 then
-          -- asking for all they have
           current_info.gal = 0
-          -- this function can be called just once after conditions but this should prevent switching slots
           change_item_info(player, oil_barrel.slot, oil_barrel.info)
           remove_item(source, player, 'oilbarell', oil_barrel.slot)
-          -- money for what they sold
+
           local money = (cost) + TRANSPORT.barell_refund
           player.Functions.AddMoney("bank", money, 'crude_oil_transport')
 
-          msg_string = 'You sold: %d gal for: %.2f$ + barrel refund: %.2f$'
+          msg_string = "Vous avez vendu : %d gallons pour : %.2f$"
           msg_string = string.format(msg_string, amount, cost, TRANSPORT.barell_refund)
           TriggerClientEvent('QBCore:Notify', source, msg_string, 'success')
 
@@ -666,9 +670,7 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:oil_transport:fillTransportW
                amount = amount
           })
      else
-          -- invalid
-          -- or they ask for much more than they have
-          TriggerClientEvent('QBCore:Notify', source, 'You either do not have a oil barell or its empty!', 'error')
+          TriggerClientEvent('QBCore:Notify', source, "Soit vous n'avez pas de baril de pétrole, soit il est vide !", 'error')
           cb(false)
           return
      end
@@ -677,19 +679,21 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:oil_transport:fillTransportW
      cb(true)
 end)
 
+
 RegisterNetEvent('keep-oilrig:server:oil_transport:checkPrice', function()
-     local names      = {
-          crudeOil = 'Crude Oil',
-          gasoline = 'Gasoline',
-          fuel_oil = 'Fuel Oil'
+     local names = {
+          crudeOil = 'Pétrole brut',
+          gasoline = 'Essence',
+          fuel_oil = 'Mazout'
      }
-     local msg_string = "Our Current Stock of [%s] is: %d/%d Price Per Gal: %.2f$"
+     local msg_string = "Notre stock actuel de [%s] est de : %d/%d Prix par gallon : %.2f$"
      for key, value in pairs(current_transport_stock) do
           local s = string.format(msg_string, names[key], math.floor(value), TRANSPORT.max_stock, TRANSPORT.prices[key])
           TriggerClientEvent('QBCore:Notify', source, s, 'primary', 7500)
      end
 
 end)
+
 
 -- =======================================
 --          Send Data / to Client
@@ -740,7 +744,7 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:createNewOilrig', function(s
 end)
 
 ---register oilrig to player by their current cid
-QBCore.Functions.CreateCallback('keep-oilrig:server:regiserOilrig', function(source, cb, inputData)
+QBCore.Functions.CreateCallback('keep-oilrig:server:registerOilrig', function(source, cb, inputData)
      -- get player by entered cid
      local cid = tonumber(inputData.cid)
      local player = QBCore.Functions.GetPlayer(cid)
@@ -794,7 +798,7 @@ QBCore.Functions.CreateCallback('keep-oilrig:server:regiserOilrig', function(sou
           TriggerClientEvent('keep-oilwell:client:force_reload', -1)
           cb(true)
      else
-          TriggerClientEvent('QBCore:Notify', source, "Could not find player by it cid!")
+          TriggerClientEvent('QBCore:Notify', source, 'Impossible de trouver le joueur avec ce CID !')
           cb(false)
      end
 end)
@@ -850,7 +854,10 @@ QBCore.Functions.CreateCallback('keep-oilwell:server:fix_oil_well', function(sou
      local items = GetOilPumpItems(oilrig_hash)
      local stash = 'oilPump_' .. oilrig_hash
      local oil_well = GlobalScirptData:getByHash(oilrig_hash)
-     if not oil_well then cb(false) return end
+     if not oil_well then
+          cb(false)
+          return
+     end
      local is_employee, is_owner = oil_well.is_employee(Player.PlayerData.citizenid)
      if not is_employee and not is_owner then
           cb(false)
@@ -870,10 +877,11 @@ QBCore.Functions.CreateCallback('keep-oilwell:server:fix_oil_well', function(sou
           end
      end
 
-     TriggerClientEvent('QBCore:Notify', source, "Items used to fix oilwell.", 'primary')
+     TriggerClientEvent('QBCore:Notify', source, 'La pompe à pétrole a été réparée avec succès !', 'primary')
      MySQL.Async.execute("UPDATE stashitems SET items = '[]' WHERE stash = ?", { stash })
      cb(true)
 end)
+
 
 QBCore.Functions.CreateCallback('keep-oilwell:server:is_employee', function(source, cb, oilrig_hash)
      local Player = QBCore.Functions.GetPlayer(source)
@@ -885,10 +893,13 @@ end)
 QBCore.Functions.CreateCallback('keep-oilwell:server:employees_list', function(source, cb, oilrig_hash)
      local Player = QBCore.Functions.GetPlayer(source)
      local oil_well = GlobalScirptData:getByHash(oilrig_hash)
-     if not oil_well then cb(false) return end
+     if not oil_well then
+          cb(false)
+          return
+     end
      local is_employee, is_owner = oil_well.is_employee(Player.PlayerData.citizenid)
      if not is_employee and not is_owner then
-          TriggerClientEvent('QBCore:Notify', source, "You can not see this list!", 'error')
+          TriggerClientEvent('QBCore:Notify', source, 'Vous n\'avez pas accès à cette liste !', 'error')
           cb(false)
           return
      end
@@ -903,7 +914,7 @@ QBCore.Functions.CreateCallback('keep-oilwell:server:employees_list', function(s
                Player = QBCore.Player.GetOfflinePlayer(value.citizenid)
                if not Player then
                     value.charinfo = {
-                         firstname = 'deleted',
+                         firstname = 'supprimé',
                          lastname = ''
                     }
                     value.online = false
@@ -913,6 +924,7 @@ QBCore.Functions.CreateCallback('keep-oilwell:server:employees_list', function(s
      cb(list)
 end)
 
+
 RegisterNetEvent('keep-oilwell:server:add_employee', function(oilrig_hash, state_id)
      state_id = tonumber(state_id)
      local src = source
@@ -921,17 +933,17 @@ RegisterNetEvent('keep-oilwell:server:add_employee', function(oilrig_hash, state
      if not oil_well then return end
      local _, is_owner = oil_well.is_employee(Player.PlayerData.citizenid)
      if not is_owner then
-          TriggerClientEvent('QBCore:Notify', src, "You must be owner of this oilwell!", 'error')
+          TriggerClientEvent('QBCore:Notify', src, 'Vous devez être le propriétaire de cette plateforme pétrolière !', 'error')
           return
      end
      local new_employee = QBCore.Functions.GetPlayer(state_id)
      if not new_employee then
-          TriggerClientEvent('QBCore:Notify', src, "Wrong state id!", 'error')
+          TriggerClientEvent('QBCore:Notify', src, 'Identifiant d\'État incorrect !', 'error')
           return
      end
 
      if new_employee.PlayerData.citizenid == oil_well.citizenid then
-          TriggerClientEvent('QBCore:Notify', src, "You can not add owner as an employee", 'error')
+          TriggerClientEvent('QBCore:Notify', src, 'Vous ne pouvez pas ajouter le propriétaire en tant qu\'employé', 'error')
           return
      end
 
@@ -949,7 +961,7 @@ RegisterNetEvent('keep-oilwell:server:add_employee', function(oilrig_hash, state
                oilrig_hash = oil_well.oilrig_hash,
                citizenid = oil_well.citizenid
           }
-          TriggerClientEvent('QBCore:Notify', src, "New employee added to the list", 'success')
+          TriggerClientEvent('QBCore:Notify', src, 'Nouvel employé ajouté à la liste', 'success')
      end)
 end)
 
@@ -965,12 +977,12 @@ RegisterNetEvent('keep-oilwell:server:remove_employee', function(oilrig_hash, ci
      if not citizenid then return end
      local _, is_owner = oil_well.is_employee(Player.PlayerData.citizenid)
      if not is_owner then
-          TriggerClientEvent('QBCore:Notify', src, "You must be owner of this oilwell!", 'error')
+          TriggerClientEvent('QBCore:Notify', src, 'Vous devez être le propriétaire de cette plateforme pétrolière !', 'error')
           return
      end
 
      if citizenid == oil_well.citizenid then
-          TriggerClientEvent('QBCore:Notify', src, "You can not fire yourself", 'error')
+          TriggerClientEvent('QBCore:Notify', src, 'Vous ne pouvez pas vous licencier vous-même', 'error')
           return
      end
 
@@ -987,9 +999,10 @@ RegisterNetEvent('keep-oilwell:server:remove_employee', function(oilrig_hash, ci
                oilrig_hash = oil_well.oilrig_hash,
                citizenid = oil_well.citizenid
           }
-          TriggerClientEvent('QBCore:Notify', src, "Employee fired!", 'success')
+          TriggerClientEvent('QBCore:Notify', src, 'Employé licencié !', 'success')
      end)
 end)
+
 
 QBCore.Functions.CreateCallback('keep-oilwell:server:oilwell_metadata', function(source, cb, oilrig_hash)
      local oil_well = GlobalScirptData:getByHash(oilrig_hash)
@@ -1004,18 +1017,16 @@ RegisterNetEvent('keep-oilwell:server:remove_oilwell', function(oilrig_hash)
      local oil_well = GlobalScirptData:getByHash(oilrig_hash)
      if not oil_well then return print('oilwell not found', src, oilrig_hash) end
      if not Player.PlayerData.job.isboss then
-          DropPlayer(src, 'you are not CEO')
+          DropPlayer(src, 'Vous n\'êtes pas le PDG')
           return
      end
 
      local sqlQuery = 'UPDATE oilrig_position SET deleted = ? WHERE oilrig_hash = ?'
      MySQL.Async.execute(sqlQuery, { 1, oil_well.oilrig_hash }, function()
-          TriggerClientEvent('QBCore:Notify', src,
-               "The deconstruction request is accepted it will be removed after the tsunami!",
-               'success'
-          )
+          TriggerClientEvent('QBCore:Notify', src, 'La demande de déconstruction est acceptée. Elle sera supprimée après le tsunami.', 'success')
      end)
 end)
+
 -- ===========================
 --          Commands
 -- ===========================

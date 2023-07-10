@@ -1,10 +1,11 @@
 Oilwell_config = Oilwell_config or {}
 
-Oilwell_config.inventory_max_size = 41
+Oilwell_config.inventory_max_size = 40
 Oilwell_config.AnimationSpeedDivider = 20 -- higher value => less animation speed at 100%
 Oilwell_config.actionSpeed = 5 -- how fast oilpump actionspeed is updated to new action speed / just visual
-Oilwell_config.fuel_script = 'LegacyFuel'
-Oilwell_config.fuel_script = 'keep-fuel'
+Oilwell_config.fuel_script = 'cdn-fuel'
+Oilwell_config.locales = 'fr' -- Langue par défaut (fr pour le français)
+Oilwell_config.translations = {}
 
 Oilwell_config.Settings = {
      size = {
@@ -22,7 +23,7 @@ Oilwell_config.Settings = {
      },
      capacity = {
           oilbarell = {
-               size = 5000, -- gal
+               size = 500, -- gal
                cost = 500
           },
           truck = {
@@ -124,19 +125,6 @@ Oilwell_config.Transport = {
      },
      barell_refund = 200,
      duration = 5 --sec
-}
-
--- Make separate file for locale
-Oilwell_config.Locale = {
-     mail = {
-          sender = 'Oil Company',
-          subject = 'Payment Receipt',
-          message = 'Dear %s %s, <br /><br />This email is a copy of Payment Receipt.<br />Your payment was: <strong>%.2f$</strong><br />Sold amount : <strong> %d (gal)</strong><br />Barrel refund : <strong> %d$</strong>'
-     },
-     info = {
-          mr = 'Mr.',
-          mrs = 'Mrs.',
-     }
 }
 
 Oilwell_config.TruckWithdraw = {

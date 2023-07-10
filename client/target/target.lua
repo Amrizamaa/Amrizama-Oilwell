@@ -1,5 +1,10 @@
 Targets = {}
 local QBCore = exports['qb-core']:GetCoreObject()
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 local loaded = false
 local PED = nil
@@ -72,21 +77,20 @@ local function makeCore()
           local vec3_coord = vector3(c.x, c.y, c.z)
           PED = spawn_ped(Oilwell_config.TruckWithdraw.npc)
 
-          exports['qb-target']:AddBoxZone("keep_oilwell_withdraw_truck_target", vec3_coord,
-               Oilwell_config.TruckWithdraw.box.l,
-               Oilwell_config.TruckWithdraw.box.w,
-               {
-                    name = "keep_oilwell_withdraw_truck_target",
-                    heading = Oilwell_config.TruckWithdraw.box.heading,
-                    debugPoly = false,
-                    minZ = vec3_coord.z + Oilwell_config.TruckWithdraw.box.minz_offset,
-                    maxZ = vec3_coord.z + Oilwell_config.TruckWithdraw.box.maxz_offset,
-               }, {
+          exports.ox_target:addBoxZone({
+               name = "keep_oilwell_withdraw_truck_target",
+               coords = vec3_coord,
+               size = vector3(3, 3, 4),
+               rotation = Oilwell_config.TruckWithdraw.box.heading,
+               debug = false,
+               minZ = vec3_coord.z + Oilwell_config.TruckWithdraw.box.minz_offset,
+               maxZ = vec3_coord.z + Oilwell_config.TruckWithdraw.box.maxz_offset,
                options = {
                     {
+                         type = "client",
                          event = "keep-oilrig:client_lib:withdraw_from_queue",
                          icon = "fa-solid fa-truck-droplet",
-                         label = 'Take out truck',
+                         label = Locales['take_out_truck_label'],
                          truck = true
                     },
                },
@@ -96,6 +100,7 @@ local function makeCore()
      end)
 end
 
+
 AddEventHandler('keep-oilwell:client:refund_truck', function(data)
      local coord = GetEntityCoords(data.entity)
      local spawnLocation = vector3(Oilwell_config.Delivery.SpawnLocation.x, Oilwell_config.Delivery.SpawnLocation.y,
@@ -104,7 +109,7 @@ AddEventHandler('keep-oilwell:client:refund_truck', function(data)
      local plate = data.vehiclePlate
 
      if #(coord - spawnLocation) > 5.0 then
-          QBCore.Functions.Notify('You are not close to truck refunding area', "primary")
+          QBCore.Functions.Notify(Locales['not_close_to_refunding_area'], "primary")
           return
      end
      QBCore.Functions.TriggerCallback('keep-oilwell:server:refund_truck', function(result)
@@ -116,6 +121,7 @@ AddEventHandler('keep-oilwell:client:refund_truck', function(data)
           end
      end, plate)
 end)
+
 
 
 AddEventHandler('onResourceStart', function(resourceName)

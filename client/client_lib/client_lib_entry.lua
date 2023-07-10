@@ -1,4 +1,9 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 function isOwner(entity)
      local oilrig = OilRigs:getByEntityHandle(entity)
@@ -131,8 +136,8 @@ function replaceString(o)
 end
 
 function createOwnerQbTarget(hash, coord)
-     exports['qb-target']:RemoveZone("oil-rig-" .. hash)
-     Targets.qb_target.oilwell(coord, hash)
+     exports.ox_target:removeZone("oil-rig-" .. hash)
+     Targets.ox_target.oilwell(coord, hash)
 end
 
 RegisterNetEvent('keep-oilwell:client:remove_oilwell', function(data)
@@ -140,7 +145,7 @@ RegisterNetEvent('keep-oilwell:client:remove_oilwell', function(data)
      for i = 1, 3, 1 do
           local value = RandomHash(4)
           local inputData = exports['qb-input']:ShowInput({
-               header = 'Enter This Values (' .. value .. ')',
+               header = Locales['enter_values'] .. ' (' .. value .. ')',
                inputs = {
                     {
                          type = 'text',
@@ -151,11 +156,11 @@ RegisterNetEvent('keep-oilwell:client:remove_oilwell', function(data)
                }
           })
           if not inputData then
-               QBCore.Functions.Notify('Canceled', "primary")
+               QBCore.Functions.Notify(Locales['canceled'], "primary")
                return
           end
           if inputData.RandomHash ~= value then
-               QBCore.Functions.Notify('Failed', "primary")
+               QBCore.Functions.Notify(Locales['failed'], "primary")
                return
           end
      end
@@ -165,17 +170,17 @@ end)
 function Add_3rd_eye(coord, Type)
      local key = Type
      if key == 'storage' then
-          Targets.qb_target.storage(coord, key)
+          Targets.ox_target.storage(coord, key)
      elseif key == 'distillation' then
-          Targets.qb_target.distillation(coord, key)
+          Targets.ox_target.distillation(coord, key)
      elseif key == 'blender' then
-          Targets.qb_target.blender(coord, key)
+          Targets.ox_target.blender(coord, key)
      elseif key == 'barrel_withdraw' then
-          Targets.qb_target.barrel_withdraw(coord, key)
+          Targets.ox_target.barrel_withdraw(coord, key)
      elseif key == 'crude_oil_transport' then
-          Targets.qb_target.crude_oil_transport(coord, key)
+          Targets.ox_target.crude_oil_transport(coord, key)
      elseif key == 'toggle_job' then
-          Targets.qb_target.toggle_job(coord, key)
+          Targets.ox_target.toggle_job(coord, key)
      end
 end
 

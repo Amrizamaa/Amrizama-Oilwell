@@ -1,20 +1,25 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local Locales = Oilwell_config.translations[Oilwell_config.locales]
+
+function GetTranslation(key)
+  return Oilwell_config.translations[Oilwell_config.locales][key]
+end
 
 local function showblender(data)
      local state = ''
-     local start_btn = 'Start'
+     local start_btn = Locales['start_btn']
      local start_icon = 'fa-solid fa-square-caret-right'
      if type(data) == "table" and data.metadata.state == false then
-          state = 'Inactive'
-          start_btn = 'Start'
+          state = Locales['inactive']
+          start_btn = Locales['start']
           start_icon = 'fa-solid fa-square-caret-right'
      else
-          state = 'Active'
-          start_btn = 'Stop'
+          state = Locales['active']
+          start_btn = Locales['stop']
           start_icon = "fa-solid fa-circle-stop"
      end
 
-     local header = "Blender unit (" .. state .. ')'
+     local header = Locales['blender_unit'] .. " (" .. state .. ')'
      -- header
      local heavy_naphtha = data.metadata.heavy_naphtha
      local light_naphtha = data.metadata.light_naphtha
@@ -30,54 +35,54 @@ local function showblender(data)
                isMenuHeader = true,
                icon = 'fa-solid fa-blender'
           }, {
-               header = 'Heavy Naphtha',
+               header = Locales['heavy_naphtha'],
                icon = 'fa-solid fa-circle',
-               txt = heavy_naphtha .. " Gallons",
+               txt = heavy_naphtha .. " " .. Locales['gallons'],
                disabled = true
           },
           {
-               header = 'Light Naphtha',
+               header = Locales['light_naphtha'],
                icon = 'fa-solid fa-circle',
-               txt = light_naphtha .. " Gallons",
+               txt = light_naphtha .. " " .. Locales['gallons'],
                disabled = true
           },
           {
-               header = 'Other Gases',
+               header = Locales['other_gases'],
                icon = 'fa-solid fa-circle',
-               txt = other_gases .. " Gallons",
+               txt = other_gases .. " " .. Locales['gallons'],
                disabled = true
           },
      }
      -- new elements
      if diesel then
           openMenu[#openMenu + 1] = {
-               header = 'Diesel',
+               header = Locales['diesel'],
                icon = 'fa-solid fa-circle',
-               txt = diesel .. " Gallons",
+               txt = diesel .. " " .. Locales['gallons'],
                disabled = true
           }
      end
 
      if kerosene then
           openMenu[#openMenu + 1] = {
-               header = 'Kerosene',
+               header = Locales['kerosene'],
                icon = 'fa-solid fa-circle',
-               txt = kerosene .. " Gallons",
+               txt = kerosene .. " " .. Locales['gallons'],
                disabled = true
           }
      end
 
      if fuel_oil then
           openMenu[#openMenu + 1] = {
-               header = 'Fuel oil',
+               header = Locales['fuel_oil'],
                icon = 'fa-solid fa-circle',
-               txt = fuel_oil .. " Gallons (no use in blending process)",
+               txt = fuel_oil .. " " .. Locales['gallons'] .. " (" .. Locales['no_use_in_blending'] .. ")",
                disabled = true
           }
      end
 
      openMenu[#openMenu + 1] = {
-          header = 'Change Recipe',
+          header = Locales['change_recipe'],
           icon = 'fa-solid fa-scroll',
           params = {
                event = "keep-oilrig:blender_menu:recipe_blender"
@@ -85,7 +90,7 @@ local function showblender(data)
      }
 
      openMenu[#openMenu + 1] = {
-          header = start_btn .. ' Blending',
+          header = start_btn .. ' ' .. Locales['blending'],
           icon = start_icon,
           params = {
                event = "keep-oilrig:blender_menu:toggle_blender"
@@ -93,7 +98,7 @@ local function showblender(data)
      }
 
      openMenu[#openMenu + 1] = {
-          header = 'Pump Fuel-Oil to Storage',
+          header = Locales['pump_fuel_oil_to_storage'],
           icon = 'fa-solid fa-arrows-spin',
           params = {
                event = "keep-oilrig:blender_menu:pump_fueloil"
@@ -101,7 +106,7 @@ local function showblender(data)
      }
 
      openMenu[#openMenu + 1] = {
-          header = 'leave',
+          header = Locales['leave'],
           icon = 'fa-solid fa-circle-xmark',
           params = {
                event = "qb-menu:closeMenu"
@@ -135,41 +140,39 @@ end
 
 AddEventHandler('keep-oilrig:blender_menu:recipe_blender', function()
      local inputData = exports['qb-input']:ShowInput({
-          header = "Pump crude oil to CDU",
-          submitText = "Enter",
+          header = Locales['pump_crude_oil_to_cdu'],
+          submitText = Locales['enter'],
           inputs = {
                {
                     type = 'number',
                     isRequired = true,
                     name = 'heavy_naphtha',
-                    text = "Heavy Naphtha"
+                    text = Locales['heavy_naphtha']
                },
                {
                     type = 'number',
                     isRequired = true,
                     name = 'light_naphtha',
-                    text = "Light Naphtha"
+                    text = Locales['light_naphtha']
                },
                {
                     type = 'number',
                     isRequired = true,
                     name = 'other_gases',
-                    text = "Other Gases"
+                    text = Locales['other_gases']
                },
                -- new elements
-
                {
                     type = 'number',
                     isRequired = true,
                     name = 'diesel',
-                    text = "Diesel"
+                    text = Locales['diesel']
                },
-
                {
                     type = 'number',
                     isRequired = true,
                     name = 'kerosene',
-                    text = "Kerosene"
+                    text = Locales['kerosene']
                },
           }
      })
@@ -184,14 +187,14 @@ AddEventHandler('keep-oilrig:blender_menu:recipe_blender', function()
               ) then
                return
           end
-
+     
           for _, value in pairs(inputData) do
                if not inRange(tonumber(value), 0, 100) then
-                    QBCore.Functions.Notify('numbers must be between 0-100', "primary")
+                    QBCore.Functions.Notify(Locales['numbers_range_error'], "primary")
                     return
                end
           end
-
+     
           QBCore.Functions.TriggerCallback('keep-oilrig:server:recipe_blender', function(result)
                showblender(result)
           end, inputData)
